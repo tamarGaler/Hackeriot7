@@ -1,0 +1,10 @@
+# Valid AWS Keys - should MATCH
+aws_access_key_1 = "AKIAIOSFODNN7EXAMPLE"
+user_aws_key = 'AKIA1234567890ABCDEF'
+backup_key = "AKIAZZZZZZZZZZZZZZZZ"
+
+# Invalid AWS Keys (False Positives) - should NOT MATCH
+fake_key_short = "AKIA12345"
+invalid_prefix = "BKIA1234567890123456"
+random_string = "1234567890ABCDEFGHIJK"
+partial_key = "AKIAXYZ"

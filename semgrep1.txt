@@ -1,52 +1,30 @@
 import requests
 
+# Safe request (HTTPS, with authentication)
 # ok:no-auth-over-http
-good_url = "https://www.github.com"
+safe_url = "https://example.com"
+r = requests.get(safe_url, auth=('user', 'pass'))
+
+# Unsafe request (HTTP, with authentication)
 # ruleid:no-auth-over-http
-bad_url = "http://www.github.com"
+unsafe_url = "http://example.com"
+r = requests.get(unsafe_url, auth=('user', 'pass'))
 
+# Unsafe POST request directly
 # ruleid:no-auth-over-http
-r = requests.post("http://www.github.com", auth=('user', 'pass'))
+r = requests.post("http://example.com/login", auth=('admin', 'admin'))
 
+# Safe POST request directly
 # ok:no-auth-over-http
-r = requests.post(good_url, auth=('user', 'pass'))
+r = requests.post("https://example.com/login", auth=('admin', 'admin'))
 
+# HTTP request without authentication (safe)
 # ok:no-auth-over-http
-r = requests.get(bad_url, timeout=50)
+r = requests.get("http://example.com/public")
 
-def test1():
-    # ruleid:no-auth-over-http
-    bad_url = "http://www.github.com"
-    print("something")
-    # ruleid:no-auth-over-http
-    r = requests.get(bad_url, auth=('user', 'pass'))
+# Importing methods directly
+from requests import get
 
-def test2():
-    # ok:no-auth-over-http
-    bad_url = "http://www.github.com"
-    print("something")
-    r = requests.post(bad_url)
-
-def test3():
-    # ok:no-auth-over-http
-    good_url = "https://www.github.com"
-    r = requests.get(good_url, auth=('user', 'pass'))
-
-def test4():
-    # ruleid:no-auth-over-http
-    r = requests.get(bad_url, auth=('user', 'pass'))
-
-def from_import_test1(url):
-    from requests import get, post
-    # ok:no-auth-over-http
-    good_url = "https://www.github.com"
-    bad_url = "http://www.github.com"
-    r = get(good_url, timeout=3)
-    r = post(bad_url)
-
-def from_import_test1(url):
-    from requests import get, post
-    # ruleid:no-auth-over-http
-    bad_url = "http://www.github.com"
-    # ruleid:no-auth-over-http
-    r = get(bad_url, timeout=3, auth=('user', 'pass'))
+# Unsafe GET request with imported method and auth
+# ruleid:no-auth-over-http
+r = get("http://example.com/private", auth=('user', 'pass'))

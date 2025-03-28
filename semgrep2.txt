@@ -1,52 +1,27 @@
-# ruleid: sqlalchemy-sql-injection
-def bad1(var):
-    session.query(MyClass).distinct("foo={}".format(var))
+import sqlite3
 
-# ruleid: sqlalchemy-sql-injection
-def bad2(var):
-    query = cls.query.join(DeploymentPermission).having(
-        "oops{}".format(var)
-    )
+connection = sqlite3.connect('example.db')
+cursor = connection.cursor()
 
-# ruleid: sqlalchemy-sql-injection
-def bad3(var):
-    query = cls.query.group_by(
-        "oops{}".format(var)
-    )
+# Vulnerable to SQL Injection
+# ruleid:sql-injection
+user_input = "' OR 1=1 --"
+query = "SELECT * FROM users WHERE username = '%s'" % user_input
+cursor.execute(query)
 
-# ruleid: sqlalchemy-sql-injection
-def bad4(var):
-    query = query.order_by("oops{}".format(var)).limit(limit)
+# Safe from SQL Injection
+# ok:sql-injection
+user_input = "admin"
+cursor.execute("SELECT * FROM users WHERE username = ?", (user_input,))
 
-# ruleid: sqlalchemy-sql-injection
-def bad5(var):
-    query = query.filter("oops{}".format(var)).limit(limit)
+# Another vulnerable example
+# ruleid:sql-injection
+def unsafe_query(username):
+    query = f"SELECT * FROM users WHERE username = '{username}'"
+    cursor.execute(query)
 
-# ok: sqlalchemy-sql-injection
-def ok1(cls, deployment: "Deployment", token_name: str) -> str:
-    query = cls.query(DeploymentPermission).distinct(
-        cls.id == DeploymentPermission.token_id,
-    )
-
-# ok: sqlalchemy-sql-injection
-def ok2(cls, deployment: "Deployment", token_name: str) -> str:
-    query = cls.query.join(DeploymentPermission).having(
-        cls == hello
-    )
-
-# ok: sqlalchemy-sql-injection
-def ok3(var):
-    query = cls.query.group_by(
-        var=3)
-
-# ok: sqlalchemy-sql-injection
-def ok4(var):
-    query = query.order_by(desc(Scan.started_at)).limit(limit)
-
-# ok: sqlalchemy-sql-injection
-def ok5(var):
-    query = query.filter(var==5).limit(limit)
-
-# ok: sqlalchemy-sql-injection
-def ok6(var):
-    query = query.filter("oops{}".bindparams(var)).limit(limit)
+# Another safe example
+# ok:sql-injection
+def safe_query(username):
+    query = "SELECT * FROM users WHERE username = ?"
+    cursor.execute(query, (username,))
